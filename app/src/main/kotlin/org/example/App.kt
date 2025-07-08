@@ -44,19 +44,27 @@ class BookStore {
     }
 
     /** @return total price */
-    fun purchaseEbook(ISBN : String , quantity : Int) =
+    fun purchaseEbook(ISBN : String , quantity : Int , email : String) =
         get(ISBN).let {
             if(!it.ebookAvailable)
                 throw EBookUnavailableException(ISBN)
+            sendEBook(ISBN , quantity , email)
             quantity * it.price
         }
-    fun purchasePaperBook(ISBN : String , quantity: Int) =
+    fun purchasePaperBook(ISBN : String , quantity: Int , address : String, shippingService: ShippingService = ShippingService()) =
         get(ISBN).let {
             if(quantity > it.quantity)
                 throw PaperBooksOutOfStock(ISBN , it.quantity)
             it.quantity -= quantity
+            shippingService.ship(ISBN , quantity , address)
             quantity * it.price
         }
+}
+
+fun sendEBook(ISBN : String , quantity: Int , email: String) {}
+
+open class ShippingService{
+    fun ship(ISBN : String , quantity: Int , address : String) {}
 }
 
 fun main() {
